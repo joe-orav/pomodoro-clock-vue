@@ -1,13 +1,17 @@
 <template>
   <div id="timer-display">
-    <h2 id="timer-label">Session</h2>
-    <p id="time-left">0:00</p>
+    <h2 id="timer-label">{{ label }}</h2>
+    <p id="time-left">{{ timeRemaining }}</p>
   </div>
 </template>
 
 <script>
 export default {
   name: "TimerDisplay",
+  props: {
+    timeRemaining: String,
+    label: String
+  },
 };
 </script>
 

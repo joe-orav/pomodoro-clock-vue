@@ -2,27 +2,36 @@
   <div id="app-container" class>
     <div id="app">
       <h1 id="app-header">Pomodoro Clock</h1>
-      <TimerDisplay />
+      <TimerDisplay :label="displayLabel" :time-remaining="timeRemaining" />
       <TimerControls />
       <div id="steps">
-        <PomodoroStep />
-        <PomodoroStep />
+        <PomodoroStep label="Session" :length="sessionLength" />
+        <PomodoroStep label="Break" :length="breakLength" />
       </div>
     </div>
   </div>
 </template>
 
 <script>
-import TimerDisplay from "./components/TimerDisplay"
-import TimerControls from "./components/TimerControls"
-import PomodoroStep from "./components/PomodoroStep"
+import TimerDisplay from "./components/TimerDisplay";
+import TimerControls from "./components/TimerControls";
+import PomodoroStep from "./components/PomodoroStep";
 
 export default {
   name: "App",
+  data() {
+    return {
+      timeRemaining: "25:00",
+      sessionLength: 25,
+      breakLength: 5,
+      displayLabel: "Session",
+      timerRunning: false
+    };
+  },
   components: {
     TimerDisplay,
     TimerControls,
-    PomodoroStep
+    PomodoroStep,
   },
 };
 </script>
@@ -61,7 +70,8 @@ body {
   margin-bottom: 15px;
 }
 
-.control-btn, .timer-btn {
+.control-btn,
+.timer-btn {
   background: rgba(135, 206, 235, 0);
   border: none;
   cursor: pointer;
