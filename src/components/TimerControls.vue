@@ -1,20 +1,35 @@
 <template>
   <div id="timer-controls">
-    <button id="start_stop" className="timer-btn"><img :src="playImg" alt="" /></button>
-    <button id="reset" className="timer-btn"><img :src="reloadImg" alt="reset" /></button>
+    <button id="start_stop" className="timer-btn" @click="toggleTimer">
+      <img :src="toggleBtn" alt="" />
+    </button>
+    <button id="reset" className="timer-btn">
+      <img :src="reloadImg" alt="reset" title="Reset" @click="resetTimer" />
+    </button>
   </div>
 </template>
 
 <script>
 import reloadImg from "../assets/img/reload.png";
 import playImg from "../assets/img/play.png";
+import pauseImg from "../assets/img/pause.png";
 export default {
   name: "TimerControls",
+  props: {
+    toggleTimer: Function,
+    timerRunning: Boolean,
+    resetTimer: Function
+  },
   data() {
     return {
       reloadImg,
-      playImg
+      playImg,
     };
+  },
+  computed: {
+    toggleBtn() {
+      return this.timerRunning ? pauseImg : playImg;
+    },
   },
 };
 </script>

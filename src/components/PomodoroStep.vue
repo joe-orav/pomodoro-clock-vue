@@ -2,11 +2,25 @@
   <div className="time-length-container">
     <p id="" className="control-label">Set {{ label }} Length:</p>
     <div className="time-length-controls">
-      <button id="" className="control-btn">▲</button>
+      <button
+        id=""
+        className="control-btn"
+        @click="updateLength(label, length + 1)"
+        :disabled="length >= 60"
+      >
+        ▲
+      </button>
       <div className="length-num-ctr">
         <p id="" className="time-length">{{ length }}</p>
       </div>
-      <button id="" className="control-btn">▼</button>
+      <button
+        id=""
+        className="control-btn"
+        @click="updateLength(label, length - 1)"
+        :disabled="length <= 1"
+      >
+        ▼
+      </button>
     </div>
   </div>
 </template>
@@ -17,6 +31,7 @@ export default {
   props: {
     label: String,
     length: Number,
+    updateLength: Function,
   },
 };
 </script>
