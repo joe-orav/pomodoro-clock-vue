@@ -10,13 +10,13 @@
       />
       <div id="steps">
         <PomodoroStep
-          :label="steps.session.label"
-          :length="steps.session.length"
+          :label="steps.sessionStep.label"
+          :length="steps.sessionStep.length"
           :update-length="updateLength"
         />
         <PomodoroStep
-          :label="steps.break.label"
-          :length="steps.break.length"
+          :label="steps.breakStep.label"
+          :length="steps.breakStep.length"
           :update-length="updateLength"
         />
       </div>
@@ -29,6 +29,23 @@ import TimerDisplay from "./components/TimerDisplay";
 import TimerControls from "./components/TimerControls";
 import PomodoroStep from "./components/PomodoroStep";
 
+function decrementTime(time) {
+  const [minutes, seconds] = time.split(":");
+  let timeInMilliseconds =
+    parseInt(minutes) * 60 * 1000 + parseInt(seconds) * 1000 - 1000;
+  let newTime = new Date(timeInMilliseconds);
+
+  let newMinutes =
+    newTime.getMinutes() < 10
+      ? "0" + newTime.getMinutes()
+      : newTime.getMinutes();
+  let newSeconds =
+    newTime.getSeconds() < 10
+      ? "0" + newTime.getSeconds()
+      : newTime.getSeconds();
+  return `${newMinutes}:${newSeconds}`;
+}
+
 export default {
   name: "App",
   data() {
@@ -36,12 +53,12 @@ export default {
       timerIntervalId: null,
       timeRemaining: "25:00",
       steps: {
-        session: {
+        sessionStep: {
           label: "Session",
           length: 25,
           active: true,
         },
-        break: {
+        breakStep: {
           label: "Break",
           length: 5,
           active: false,
@@ -57,9 +74,9 @@ export default {
       };
     },
     displayLabel() {
-      return this.steps.session.active
-        ? this.steps.session.label
-        : this.steps.break.label;
+      return this.steps.sessionStep.active
+        ? this.steps.sessionStep.label
+        : this.steps.breakStep.label;
     },
   },
   methods: {
@@ -68,20 +85,26 @@ export default {
 
       if (newTimerState) {
         this.timerIntervalId = setInterval(() => {
-          const [minutes, seconds] = this.timeRemaining.split(":");
-          let timeInMilliseconds =
-            parseInt(minutes) * 60 * 1000 + parseInt(seconds) * 1000 - 1000;
-          let newTime = new Date(timeInMilliseconds);
+          let newTimeRemaining = decrementTime(this.timeRemaining);
 
-          let newMinutes =
-            newTime.getMinutes() < 10
-              ? "0" + newTime.getMinutes()
-              : newTime.getMinutes();
-          let newSeconds =
-            newTime.getSeconds() < 10
-              ? "0" + newTime.getSeconds()
-              : newTime.getSeconds();
-          this.timeRemaining = `${newMinutes}:${newSeconds}`;
+          if (this.timeRemaining === "00:00") {
+            const { sessionStep, breakStep } = this.steps;
+            if (sessionStep.active) {
+              this.steps.sessionStep.active = false;
+              this.steps.breakStep.active = true;
+              this.timeRemaining = `${breakStep.length < 10 ? "0" : ""}${
+                breakStep.length
+              }:00`;
+            } else {
+              this.steps.sessionStep.active = true;
+              this.steps.breakStep.active = false;
+              this.timeRemaining = `${sessionStep.length < 10 ? "0" : ""}${
+                sessionStep.length
+              }:00`;
+            }
+          } else {
+            this.timeRemaining = newTimeRemaining;
+          }
         }, 1000);
       } else {
         clearInterval(this.timerIntervalId);
@@ -90,7 +113,8 @@ export default {
       this.timerRunning = newTimerState;
     },
     updateLength(name, newLength) {
-      let step = this.steps[name.toLowerCase()];
+      const { sessionStep, breakStep } = this.steps;
+      let step = sessionStep.label == name ? sessionStep : breakStep;
 
       if (!this.timerRunning) {
         step.length = newLength;
@@ -104,12 +128,12 @@ export default {
       clearInterval(this.timerIntervalId);
       this.timeRemaining = "25:00";
       this.steps = {
-        session: {
+        sessionStep: {
           label: "Session",
           length: 25,
           active: true,
         },
-        break: {
+        breakStep: {
           label: "Break",
           length: 5,
           active: false,
