@@ -1,24 +1,5 @@
-# pomodoro-clock-vue
+# Pomodoro Clock
+A Pomodoro Clock app that allows you to set your session and break length and even includes some nice visuals while in use. This is my second Pomodoro Clock app which was developed with Vue. [Here](https://github.com/joe-orav/pomodoro-clock) is my first one developed with React.
 
-## Project setup
-```
-npm install
-```
-
-### Compiles and hot-reloads for development
-```
-npm run serve
-```
-
-### Compiles and minifies for production
-```
-npm run build
-```
-
-### Lints and fixes files
-```
-npm run lint
-```
-
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
+## Accessing the App
+App can be accessed by going to http://pomodoro-clock-vue.vercel.app/
