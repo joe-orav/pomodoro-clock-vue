@@ -2,7 +2,7 @@
   <div id="app-container" :class="containerClasses">
     <div id="app">
       <h1 id="app-header">Pomodoro Clock</h1>
-      <TimerDisplay :label="displayLabel" :time-remaining="timeRemaining" />
+      <TimerDisplay :label="displayLabel" :time-remaining="clockTime" />
       <TimerControls
         :toggle-timer="toggleTimer"
         :timer-running="timerRunning"
@@ -29,21 +29,12 @@ import TimerDisplay from "./components/TimerDisplay";
 import TimerControls from "./components/TimerControls";
 import PomodoroStep from "./components/PomodoroStep";
 
-function decrementTime(time) {
-  const [minutes, seconds] = time.split(":");
-  let timeInMilliseconds =
-    parseInt(minutes) * 60 * 1000 + parseInt(seconds) * 1000 - 1000;
-  let newTime = new Date(timeInMilliseconds);
+const DEFAULT_SESSION_TIME = 25;
+const DEFAULT_BREAK_TIME = 5;
+const DECREMENT_VALUE = 1000;
 
-  let newMinutes =
-    newTime.getMinutes() < 10
-      ? "0" + newTime.getMinutes()
-      : newTime.getMinutes();
-  let newSeconds =
-    newTime.getSeconds() < 10
-      ? "0" + newTime.getSeconds()
-      : newTime.getSeconds();
-  return `${newMinutes}:${newSeconds}`;
+function convertToMinutes(minutes) {
+  return minutes * 60 * 1000;
 }
 
 export default {
@@ -51,16 +42,16 @@ export default {
   data() {
     return {
       timerIntervalId: null,
-      timeRemaining: "25:00",
+      timeRemaining: convertToMinutes(DEFAULT_SESSION_TIME),
       steps: {
         sessionStep: {
           label: "Session",
-          length: 25,
+          length: DEFAULT_SESSION_TIME,
           active: true,
         },
         breakStep: {
           label: "Break",
-          length: 5,
+          length: DEFAULT_BREAK_TIME,
           active: false,
         },
       },
@@ -68,9 +59,16 @@ export default {
     };
   },
   computed: {
+    clockTime() {
+      let newTime = new Date(this.timeRemaining);
+      return `${newTime.getMinutes() < 10 ? "0" : ""}${newTime.getMinutes()}:${
+        newTime.getSeconds() < 10 ? "0" : ""
+      }${newTime.getSeconds()}`;
+    },
     containerClasses() {
       return {
-        "color-loop-animation": this.timerRunning,
+        "color-loop-animation": this.timerRunning && this.timeRemaining > 10 * 1000,
+        "red-color-loop-animation": this.timerRunning && this.timeRemaining <= 10 * 1000
       };
     },
     displayLabel() {
@@ -85,23 +83,19 @@ export default {
 
       if (newTimerState) {
         this.timerIntervalId = setInterval(() => {
-          let newTimeRemaining = decrementTime(this.timeRemaining);
+          let newTimeRemaining = this.timeRemaining - DECREMENT_VALUE;
 
-          if (this.timeRemaining === "00:00") {
+          if (this.timeRemaining === 0) {
             const { sessionStep, breakStep } = this.steps;
-            if (sessionStep.active) {
-              this.steps.sessionStep.active = false;
-              this.steps.breakStep.active = true;
-              this.timeRemaining = `${breakStep.length < 10 ? "0" : ""}${
-                breakStep.length
-              }:00`;
-            } else {
-              this.steps.sessionStep.active = true;
-              this.steps.breakStep.active = false;
-              this.timeRemaining = `${sessionStep.length < 10 ? "0" : ""}${
-                sessionStep.length
-              }:00`;
-            }
+
+            this.steps = {
+              sessionStep: { ...sessionStep, active: !sessionStep.active },
+              breakStep: { ...breakStep, active: !breakStep.active },
+            };
+
+            this.timeRemaining = convertToMinutes(
+              sessionStep.active ? breakStep.length : sessionStep.length
+            );
           } else {
             this.timeRemaining = newTimeRemaining;
           }
@@ -120,22 +114,22 @@ export default {
         step.length = newLength;
 
         if (step.active) {
-          this.timeRemaining = (newLength < 10 ? "0" : "") + newLength + ":00";
+          this.timeRemaining = convertToMinutes(newLength);
         }
       }
     },
     resetTimer() {
       clearInterval(this.timerIntervalId);
-      this.timeRemaining = "25:00";
+      this.timeRemaining = convertToMinutes(DEFAULT_SESSION_TIME);
       this.steps = {
         sessionStep: {
           label: "Session",
-          length: 25,
+          length: DEFAULT_SESSION_TIME,
           active: true,
         },
         breakStep: {
           label: "Break",
-          length: 5,
+          length: DEFAULT_BREAK_TIME,
           active: false,
         },
       };
@@ -207,31 +201,31 @@ body {
   }
 
   20% {
-    background-color: #0000ff;
+    background-color: #0a0aa5;
   }
 
   30% {
-    background-color: #ff7f00;
+    background-color: #a15304;
   }
 
   40% {
-    background-color: #00ff00;
+    background-color: #07a307;
   }
 
   50% {
-    background-color: #ffff00;
+    background-color: #aaaa09;
   }
 
   60% {
-    background-color: #00ff00;
+    background-color: #019601;
   }
 
   70% {
-    background-color: #ff7f00;
+    background-color: #a35507;
   }
 
   80% {
-    background-color: #0000ff;
+    background-color: #0606ad;
   }
 
   90% {
