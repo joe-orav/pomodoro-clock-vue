@@ -194,6 +194,26 @@ body {
   cursor: pointer;
   outline: none;
 }
+
+@media screen and (max-width: 376px) {
+  #app-header {
+    font-size: 2em;
+  }
+
+  #timer-label {
+    font-size: 1.5em;
+  }
+
+  #time-left {
+    font-size: 4em;
+  }
+
+  .time-length-container {
+    flex-direction: column;
+    align-items: center;
+  }
+}
+
 .color-loop-animation {
   animation-name: color-loop;
   animation-duration: 50s;
