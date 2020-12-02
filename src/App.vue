@@ -28,10 +28,12 @@
 import TimerDisplay from "./components/TimerDisplay";
 import TimerControls from "./components/TimerControls";
 import PomodoroStep from "./components/PomodoroStep";
+import audioFile from "./assets/soft-bells.mp3";
 
 const DEFAULT_SESSION_TIME = 25;
 const DEFAULT_BREAK_TIME = 5;
 const DECREMENT_VALUE = 1000;
+const alertAudio = new Audio(audioFile);
 
 function convertToMinutes(minutes) {
   return minutes * 60 * 1000;
@@ -67,8 +69,10 @@ export default {
     },
     containerClasses() {
       return {
-        "color-loop-animation": this.timerRunning && this.timeRemaining > 10 * 1000,
-        "red-color-loop-animation": this.timerRunning && this.timeRemaining <= 10 * 1000
+        "color-loop-animation":
+          this.timerRunning && this.timeRemaining > 10 * 1000,
+        "red-color-loop-animation":
+          this.timerRunning && this.timeRemaining <= 10 * 1000,
       };
     },
     displayLabel() {
@@ -84,6 +88,11 @@ export default {
       if (newTimerState) {
         this.timerIntervalId = setInterval(() => {
           let newTimeRemaining = this.timeRemaining - DECREMENT_VALUE;
+
+          if (newTimeRemaining === 0) {
+            alertAudio.play();
+            alertAudio.currentTime = 0;
+          }
 
           if (this.timeRemaining === 0) {
             const { sessionStep, breakStep } = this.steps;
